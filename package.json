@@ -7,10 +7,21 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "detox:cucumber": "yarn cucumber-js ./e2e/features/*.feature --retry 1",
+    "detox:ios:build": "yarn detox build --configuration ios.sim.debug",
+    "detox:ios:test": "configuration='ios.sim.debug' yarn detox:cucumber",
+    "detox:ios:test:verbose": "loglevel='verbose' yarn detox:ios:test",
+    "detox:android:build": "yarn detox build --configuration android.emu.debug",
+    "detox:android:test": "configuration='android.emu.debug' yarn detox:cucumber",
+    "detox:android:test:verbose": "loglevel='verbose' yarn detox:android:test"
   },
   "dependencies": {
+    "moment-timezone": "^0.5.31",
+    "detox": "17.8.0",
     "react": "16.13.1",
+    "shelljs": "^0.8.4",
+    "cucumber": "^6.0.5",
     "react-native": "0.63.4"
   },
   "devDependencies": {
@@ -25,5 +36,35 @@
   },
   "jest": {
     "preset": "react-native"
+  },
+  "detox": {
+    "configurations": {
+      "ios.sim.debug": {
+        "binaryPath": "ios/build/Build/Products/Debug-iphonesimulator/DetoxCucumber.app",
+        "build": "xcodebuild -workspace ios/DetoxCucumber.xcworkspace -scheme DetoxCucumber -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build | xcpretty -f `xcpretty-travis-formatter`",
+        "type": "ios.simulator",
+        "name": "iPhone 11 Pro"
+      },
+      "ios.sim.release": {
+        "binaryPath": "ios/build/Build/Products/Release-iphonesimulator/DetoxCucumber.app",
+        "build": "xcodebuild -workspace ios/DetoxCucumber.xcworkspace -scheme DetoxCucumber -configuration Release -sdk iphonesimulator -derivedDataPath ios/build | xcpretty -f `xcpretty-travis-formatter`",
+        "type": "ios.simulator",
+        "name": "iPhone 11"
+      },
+      "android.emu.debug": {
+        "binaryPath": "android/app/build/outputs/apk/debug/app-debug.apk",
+        "build": "cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
+        "type": "android.emulator",
+        "name": "Nexus_5X_API_27"
+      },
+      "android.emu.release": {
+        "binaryPath": "android/app/build/outputs/apk/release/app-release.apk",
+        "build": "cd android && ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release && cd ..",
+        "type": "android.emulator",
+        "name": "Nexus_5X_API_27"
+      }
+    },
+    "test-runner": "jest",
+    "specs": ""
   }
 }
