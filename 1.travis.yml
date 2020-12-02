@@ -1,0 +1,56 @@
+language: java
+
+branches:
+  only:
+  - master
+
+
+cache:
+  yarn: true
+  directories:
+    - node_modules
+
+
+services:
+  - docker
+
+before_install:
+- docker pull reactnativecommunity/react-native-android
+
+script:
+- npm i -g envinfo detox-cli && envinfo
+# - docker run --rm --name rn-env reactnativecommunity/react-native-android bash -c "npm i -g envinfo && envinfo"
+- npm install -g react-native-cli
+# - npm install -g detox-cli
+- echo fs.inotify.max_user_watches=524288 | tee -a /etc/sysctl.conf && sysctl -p
+- mkdir -p /root/.android && touch /root/.android/repositories.cfg
+- echo yes | $ANDROID_HOME/tools/bin/sdkmanager --channel=0 --verbose "system-images;android-27;default;x86_64"
+- echo no | $ANDROID_HOME/tools/bin/avdmanager --verbose create avd --force --name "Nexus5X" --package "system-images;android-27;default;x86_64" --sdcard 200M --device 11
+- adb start-server
+- yarn detox build --configuration android.emu.release
+- configuration="android.emu.release" yarn detox:cucumber
+# - docker run --rm --name rn-build -v $PWD:/pwd -w /pwd reactnativecommunity/react-native-android bash -c "yarn install && cd android && chmod +x gradlew && ./gradlew assembleRelease"
+
+
+# env:
+#   global:
+#   - NODE_VERSION=12
+#   # - NODE_VERSION=stable
+
+# install:
+# - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
+# - export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+# - nvm install $NODE_VERSION
+# - nvm use $NODE_VERSION
+# - nvm alias default $NODE_VERSION
+
+# - npm install -g yarn
+# - npm install -g react-native-cli
+# - npm install -g detox-cli
+
+
+# script:
+# - yarn install --silent
+# - yarn detox build --configuration ios.sim.release
+# - yarn detox clean-framework-cache && yarn detox build-framework-cache
+# - configuration="ios.sim.release" yarn detox:cucumber
