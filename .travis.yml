@@ -1,42 +1,50 @@
-language: objective-c
-# osx_image: xcode8.3
-osx_image: xcode11.6
+language: java
 
-branches:
-  only:
-  - master
+services:
+  - docker
 
-env:
-  global:
-  - NODE_VERSION=12
-  # - NODE_VERSION=stable
-
-cache:
-  yarn: true
-  directories:
-    - node_modules
-
-install:
-- brew tap wix/brew
-- brew install applesimutils
-- curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
-- export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-- nvm install $NODE_VERSION
-- nvm use $NODE_VERSION
-- nvm alias default $NODE_VERSION
-
-- npm install -g yarn
-- npm install -g react-native-cli
-- npm install -g detox-cli
-- gem install xcpretty
-- gem install xcpretty-travis-formatter
-
+before_install:
+- docker pull reactnativecommunity/react-native-android
 
 script:
-- yarn install --silent
-- cd ios
-- pod install
-- cd ..
-- yarn detox build --configuration ios.sim.release
-- yarn detox clean-framework-cache && yarn detox build-framework-cache
-- configuration="ios.sim.release" yarn detox:cucumber
+- docker run --rm --name rn-env reactnativecommunity/react-native-android bash -c "npm i -g envinfo && envinfo"
+- docker run --rm --name rn-build -v $PWD:/pwd -w /pwd reactnativecommunity/react-native-android bash -c "yarn install && cd android && chmod +x gradlew && ./gradlew assembleRelease"
+
+# language: objective-c
+# osx_image: xcode11.6
+
+# branches:
+#   only:
+#   - master
+
+# env:
+#   global:
+#   - NODE_VERSION=12
+#   # - NODE_VERSION=stable
+
+# cache:
+#   yarn: true
+#   directories:
+#     - node_modules
+
+# install:
+# - brew tap wix/brew
+# - brew install applesimutils
+# - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
+# - export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+# - nvm install $NODE_VERSION
+# - nvm use $NODE_VERSION
+# - nvm alias default $NODE_VERSION
+
+# - npm install -g yarn
+# - npm install -g react-native-cli
+# - npm install -g detox-cli
+# - gem install xcpretty
+# - gem install xcpretty-travis-formatter
+
+
+# script:
+# - yarn install --silent
+# - yarn detox build --configuration ios.sim.release
+# - yarn detox clean-framework-cache && yarn detox build-framework-cache
+# - configuration="ios.sim.release" yarn detox:cucumber
