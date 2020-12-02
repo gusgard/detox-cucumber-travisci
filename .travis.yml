@@ -10,7 +10,9 @@ android:
     # - android-21
     # - android-26
     - android-27
-    - sys-img-armeabi-v7a-android-21
+    # - sys-img-armeabi-v7a-android-21
+    - sys-img-x86-android-27
+    # Additional components
     - extra-android-m2repository
     - extra-google-m2repository
     - extra-google-google_play_services
@@ -40,11 +42,13 @@ script:
 # - sdkmanager --install "system-images;android-27;google_apis;x86
 # - echo $ANDROID_HOME"
 - echo yes | sdkmanager --channel=0 --verbose "system-images;android-27;default;x86_64"
-- echo no | avdmanager --verbose create avd --force --name "Nexus5X" --package "system-images;android-27;default;x86_64" --sdcard 200M --device 11
+- echo no | android --verbose create avd --force --name "Nexus5X" --package "system-images;android-27;default;x86_64" --sdcard 200M --device 11
+# - echo no | avdmanager --verbose create avd --force --name "Nexus5X" --package "system-images;android-27;default;x86_64" --sdcard 200M --device 11
 # - echo yes | $ANDROID_HOMEtools/bin/sdkmanager --channel=0 --verbose "system-images;android-27;default;x86_64"
 # - echo no | $ANDROID_HOMEtools/bin/avdmanager --verbose create avd --force --name "Nexus5X" --package "system-images;android-27;default;x86_64" --sdcard 200M --device 11
 - echo "Waiting emulator is ready..."
 - emulator -list-avds
+- android list targets
 
 # - emulator -avd "Nexus_5X_API_27" -debug-init -no-window -no-audio -gpu swiftshader_indirect -show-kernel &
 # - adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 82'
