@@ -1,56 +1,54 @@
-language: java
+os: linux
+language: android
+jdk: oraclejdk8
+sudo: required
+android:
+  components:
+    - platform-tools
+    - tools
+    - build-tools-26.0.3
+    - android-21
+    - android-26
+    - android-27
+    - sys-img-armeabi-v7a-android-21
+    - extra-android-m2repository
+    - extra-google-m2repository
+    - extra-google-google_play_services
 
-branches:
-  only:
-  - master
-
+env:
+  global:
+  - NODE_VERSION=12
+  # - NODE_VERSION=stable
 
 cache:
   yarn: true
   directories:
     - node_modules
 
-
-services:
-  - docker
-
-before_install:
-- docker pull reactnativecommunity/react-native-android
-
 script:
-- npm i -g envinfo detox-cli && envinfo
-# - docker run --rm --name rn-env reactnativecommunity/react-native-android bash -c "npm i -g envinfo && envinfo"
+- curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
+- export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+- nvm install $NODE_VERSION
+- nvm use $NODE_VERSION
+- nvm alias default $NODE_VERSION
+
+- npm install -g yarn
 - npm install -g react-native-cli
-# - npm install -g detox-cli
-- echo fs.inotify.max_user_watches=524288 | tee -a /etc/sysctl.conf && sysctl -p
-- mkdir -p /root/.android && touch /root/.android/repositories.cfg
+- npm install -g detox-cli
+
+# - yes | sdkmanager --licenses
+# - sdkmanager --install "system-images;android-27;google_apis;x86
 - echo yes | $ANDROID_HOME/tools/bin/sdkmanager --channel=0 --verbose "system-images;android-27;default;x86_64"
 - echo no | $ANDROID_HOME/tools/bin/avdmanager --verbose create avd --force --name "Nexus5X" --package "system-images;android-27;default;x86_64" --sdcard 200M --device 11
-- adb start-server
+- echo "Waiting emulator is ready..."
+
+# - emulator -avd "Nexus_5X_API_27" -debug-init -no-window -no-audio -gpu swiftshader_indirect -show-kernel &
+# - adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 82'
+ 
+- yarn install --silent
+
+
+
 - yarn detox build --configuration android.emu.release
-- configuration="android.emu.release" yarn detox:cucumber
-# - docker run --rm --name rn-build -v $PWD:/pwd -w /pwd reactnativecommunity/react-native-android bash -c "yarn install && cd android && chmod +x gradlew && ./gradlew assembleRelease"
-
-
-# env:
-#   global:
-#   - NODE_VERSION=12
-#   # - NODE_VERSION=stable
-
-# install:
-# - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
-# - export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-# - nvm install $NODE_VERSION
-# - nvm use $NODE_VERSION
-# - nvm alias default $NODE_VERSION
-
-# - npm install -g yarn
-# - npm install -g react-native-cli
-# - npm install -g detox-cli
-
-
-# script:
-# - yarn install --silent
-# - yarn detox build --configuration ios.sim.release
 # - yarn detox clean-framework-cache && yarn detox build-framework-cache
-# - configuration="ios.sim.release" yarn detox:cucumber
+- configuration="android.emu.release" yarn detox:cucumber
