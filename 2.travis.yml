@@ -1,0 +1,70 @@
+os: linux
+language: android
+jdk: oraclejdk8
+sudo: required
+android:
+  components:
+    - platform-tools
+    - tools
+    - build-tools-27.0.3
+    # - android-21
+    # - android-26
+    - android-27
+    # - sys-img-armeabi-v7a-android-21
+    - sys-img-x86-android-27
+    # Additional components
+    - extra-android-m2repository
+    - extra-google-m2repository
+    - extra-google-google_play_services
+
+env:
+  global:
+  - NODE_VERSION=12
+  # - NODE_VERSION=stable
+
+cache:
+  yarn: true
+  directories:
+    - node_modules
+
+script:
+- curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
+- export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+- nvm install $NODE_VERSION
+- nvm use $NODE_VERSION
+- nvm alias default $NODE_VERSION
+
+- npm install -g yarn
+- npm install -g react-native-cli
+- npm install -g detox-cli
+
+- export ANDROID_HOME=/usr/local/android-sdk
+- export PATH=$PATH:$ANDROID_HOME/emulator
+- export PATH=$PATH:$ANDROID_HOME/tools
+- export PATH=$PATH:$ANDROID_HOME/tools/bin
+- export PATH=$PATH:$ANDROID_HOME/platform-tools
+- which avdmanager
+# - yes | sdkmanager --licenses
+# - sdkmanager --install "system-images;android-27;google_apis;x86
+- echo $ANDROID_HOME"
+- echo yes | sdkmanager --channel=0 --verbose "system-images;android-27;default;x86_64"
+# - echo no | android --verbose create avd --force --name "Nexus5X" --package "system-images;android-27;default;x86_64" --sdcard 200M --device 11
+- echo no | avdmanager --verbose create avd --force --name "Nexus5X" --package "system-images;android-27;default;x86_64" --sdcard 200M --device 11
+
+# - echo yes | $ANDROID_HOMEtools/bin/sdkmanager --channel=0 --verbose "system-images;android-27;default;x86_64"
+# - echo no | $ANDROID_HOME/tools/bin/avdmanager --verbose create avd --force --name "Nexus5X" --package "system-images;android-27;default;x86_64" --sdcard 200M --device 11
+
+- echo "Waiting emulator is ready..."
+- emulator -list-avds
+- android list targets
+
+# - emulator -avd "Nexus_5X_API_27" -debug-init -no-window -no-audio -gpu swiftshader_indirect -show-kernel &
+# - adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 82'
+ 
+- yarn install --silent
+
+
+
+- yarn detox build --configuration android.emu.release
+# - yarn detox clean-framework-cache && yarn detox build-framework-cache
+- configuration="android.emu.release" yarn detox:cucumber
