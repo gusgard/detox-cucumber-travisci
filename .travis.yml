@@ -1,21 +1,42 @@
-os: linux
 language: android
-jdk: oraclejdk8
-sudo: required
+dist: trusty
 android:
   components:
-    - platform-tools
+    # Uncomment the lines below if you want to
+    # use the latest revision of Android SDK Tools
     - tools
-    - build-tools-27.0.3
-    # - android-21
-    # - android-26
-    - android-27
-    # - sys-img-armeabi-v7a-android-21
-    - sys-img-x86-android-27
+    - platform-tools
+
+    # The BuildTools version used by your project
+    - build-tools-26.0.2
+
+    # The SDK version used to compile your project
+    - android-26
+
     # Additional components
-    - extra-android-m2repository
-    - extra-google-m2repository
     - extra-google-google_play_services
+    - extra-google-m2repository
+    - extra-android-m2repository
+
+    # Specify at least one system image,
+    # if you need to run emulator(s) during your tests
+    - sys-img-x86-android-26
+    - sys-img-armeabi-v7a-android-17
+  licenses:
+    - 'android-sdk-preview-license-52d11cd2'
+    - 'android-sdk-preview-license-.+'
+    - 'android-sdk-license-.+'
+    - 'google-gdk-license-.+'
+
+# os: linux
+# language: android
+# jdk: oraclejdk8
+# sudo: required
+# android:
+#   components:
+#     - build-tools-27.0.3
+#     - android-27
+#     - sys-img-x86-android-27
 
 env:
   global:
@@ -26,6 +47,13 @@ cache:
   yarn: true
   directories:
     - node_modules
+
+# Emulator Management: Create, Start and Wait
+before_script:
+  - echo no | android create avd --force --name "Nexus5X" -t android-26 --abi armeabi-v7a -c 100M
+  - emulator -avd test -no-audio -no-window &
+  - android-wait-for-emulator
+  - adb shell input keyevent 82 &
 
 script:
 - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
@@ -38,33 +66,21 @@ script:
 - npm install -g react-native-cli
 - npm install -g detox-cli
 
-- export ANDROID_HOME=/usr/local/android-sdk
-- export PATH=$PATH:$ANDROID_HOME/emulator
-- export PATH=$PATH:$ANDROID_HOME/tools
-- export PATH=$PATH:$ANDROID_HOME/tools/bin
-- export PATH=$PATH:$ANDROID_HOME/platform-tools
+# - export ANDROID_HOME=/usr/local/android-sdk
+# - export PATH=$PATH:$ANDROID_HOME/emulator
+# - export PATH=$PATH:$ANDROID_HOME/tools
+# - export PATH=$PATH:$ANDROID_HOME/tools/bin
+# - export PATH=$PATH:$ANDROID_HOME/platform-tools
 - which avdmanager
 # - yes | sdkmanager --licenses
 # - sdkmanager --install "system-images;android-27;google_apis;x86
 - echo $ANDROID_HOME"
-- echo yes | sdkmanager --channel=0 --verbose "system-images;android-27;default;x86_64"
-# - echo no | android --verbose create avd --force --name "Nexus5X" --package "system-images;android-27;default;x86_64" --sdcard 200M --device 11
-- echo no | avdmanager --verbose create avd --force --name "Nexus5X" --package "system-images;android-27;default;x86_64" --sdcard 200M --device 11
-
-# - echo yes | $ANDROID_HOMEtools/bin/sdkmanager --channel=0 --verbose "system-images;android-27;default;x86_64"
-# - echo no | $ANDROID_HOME/tools/bin/avdmanager --verbose create avd --force --name "Nexus5X" --package "system-images;android-27;default;x86_64" --sdcard 200M --device 11
-
+# - echo yes | sdkmanager --channel=0 --verbose "system-images;android-27;default;x86_64"
 - echo "Waiting emulator is ready..."
 - emulator -list-avds
 - android list targets
 
-# - emulator -avd "Nexus_5X_API_27" -debug-init -no-window -no-audio -gpu swiftshader_indirect -show-kernel &
-# - adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 82'
- 
 - yarn install --silent
-
-
-
 - yarn detox build --configuration android.emu.release
 # - yarn detox clean-framework-cache && yarn detox build-framework-cache
 - configuration="android.emu.release" yarn detox:cucumber
