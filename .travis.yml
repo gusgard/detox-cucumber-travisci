@@ -38,14 +38,22 @@ script:
 - npm install -g react-native-cli
 - npm install -g detox-cli
 
+- export ANDROID_HOME=/usr/local/android-sdk
+- export PATH=$PATH:$ANDROID_HOME/emulator
+- export PATH=$PATH:$ANDROID_HOME/tools
+- export PATH=$PATH:$ANDROID_HOME/tools/bin
+- export PATH=$PATH:$ANDROID_HOME/platform-tools
+- which avdmanager
 # - yes | sdkmanager --licenses
 # - sdkmanager --install "system-images;android-27;google_apis;x86
-# - echo $ANDROID_HOME"
+- echo $ANDROID_HOME"
 - echo yes | sdkmanager --channel=0 --verbose "system-images;android-27;default;x86_64"
-- echo no | android --verbose create avd --force --name "Nexus5X" --package "system-images;android-27;default;x86_64" --sdcard 200M --device 11
-# - echo no | avdmanager --verbose create avd --force --name "Nexus5X" --package "system-images;android-27;default;x86_64" --sdcard 200M --device 11
+# - echo no | android --verbose create avd --force --name "Nexus5X" --package "system-images;android-27;default;x86_64" --sdcard 200M --device 11
+- echo no | avdmanager --verbose create avd --force --name "Nexus5X" --package "system-images;android-27;default;x86_64" --sdcard 200M --device 11
+
 # - echo yes | $ANDROID_HOMEtools/bin/sdkmanager --channel=0 --verbose "system-images;android-27;default;x86_64"
-# - echo no | $ANDROID_HOMEtools/bin/avdmanager --verbose create avd --force --name "Nexus5X" --package "system-images;android-27;default;x86_64" --sdcard 200M --device 11
+# - echo no | $ANDROID_HOME/tools/bin/avdmanager --verbose create avd --force --name "Nexus5X" --package "system-images;android-27;default;x86_64" --sdcard 200M --device 11
+
 - echo "Waiting emulator is ready..."
 - emulator -list-avds
 - android list targets
