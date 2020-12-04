@@ -12,6 +12,7 @@ android:
     - build-tools-27.0.3
 
     # The SDK version used to compile your project
+    - android-22
     # - android-24
     # - android-26
     # - android-27
@@ -20,6 +21,8 @@ android:
     - extra-google-google_play_services
     - extra-google-m2repository
     - extra-android-m2repository
+
+    - extra-android-support
 
     # Specify at least one system image,
     # if you need to run emulator(s) during your tests
@@ -34,6 +37,8 @@ android:
     - $ANDROID_TARGET
     - sys-img-x86-$ANDROID_TARGET
     - sys-img-armeabi-v7a-$ANDROID_TARGET
+    - sys-img-$ANDROID_ABI-addon-google_apis-google-$ANDROID_API_LEVEL
+    - sys-img-$ANDROID_ABI-google_apis-$ANDROID_API_LEVEL
   licenses:
     - android-sdk-preview-license-.+
     - android-sdk-license-.+
@@ -45,8 +50,8 @@ env:
     # - ANDROID_TARGET=android-4 ANDROID_ABI=armeabi
     # - ANDROID_TARGET=android-10 ANDROID_ABI=armeabi
     # - ANDROID_TARGET=android-24 ANDROID_ABI=armeabi-v7a
-    - ANDROID_TARGET=android-26 ANDROID_ABI=armeabi-v7a
-    - ANDROID_TARGET=android-27 ANDROID_ABI=armeabi-v7a
+    - ANDROID_API_LEVEL=26 ANDROID_TARGET=android-26 ANDROID_ABI=armeabi-v7a
+    - ANDROID_API_LEVEL=27 ANDROID_TARGET=android-27 ANDROID_ABI=armeabi-v7a
   global:
     - NODE_VERSION=12
 
@@ -64,7 +69,7 @@ before_script:
   - android list targets
   # - echo "End Testing commands..."
 
-  - echo no | android create avd --force -n Nexus5X -t $ANDROID_TARGET --abi $ANDROID_ABI -c 100M
+  - echo no | android create avd --force -n Nexus5X -t $ANDROID_TARGET --abi google_apis/$ANDROID_ABI -c 100M
   # - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a -c 100M
   - emulator -avd Nexus5X -no-audio -no-window &
   - android-wait-for-emulator
