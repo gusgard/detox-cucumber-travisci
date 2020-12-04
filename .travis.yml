@@ -59,10 +59,10 @@ cache:
 before_script:
   - echo "Start Testing commands..."
   # - which avdmanager
-  - echo $ANDROID_HOME"
-  - emulator -list-avds
-  - android list targets
-  - echo "End Testing commands..."
+  # - echo $ANDROID_HOME"
+  # - emulator -list-avds
+  # - android list targets
+  # - echo "End Testing commands..."
 
   - echo no | android create avd --force -n Nexus5X -t $ANDROID_TARGET --abi $ANDROID_ABI -c 100M
   # - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a -c 100M
@@ -97,10 +97,10 @@ script:
   # - export PATH=$PATH:$ANDROID_HOME/tools
   # - export PATH=$PATH:$ANDROID_HOME/tools/bin
   # - export PATH=$PATH:$ANDROID_HOME/platform-tools
-  - which avdmanager
+  # - which avdmanager
   # - yes | sdkmanager --licenses
   # - sdkmanager --install "system-images;android-27;google_apis;x86
-  - echo $ANDROID_HOME"
+  # - echo $ANDROID_HOME"
   # - echo yes | sdkmanager --channel=0 --verbose "system-images;android-27;default;x86_64"
   - echo "Waiting emulator is ready..."
   - emulator -list-avds
