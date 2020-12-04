@@ -36,7 +36,7 @@ android:
 
     - $ANDROID_TARGET
     - sys-img-x86-$ANDROID_TARGET
-    - sys-img-armeabi-v7a-$ANDROID_TARGET
+    # - sys-img-armeabi-v7a-$ANDROID_TARGET
     - sys-img-$ANDROID_ABI-addon-google_apis-google-$ANDROID_API_LEVEL
     - sys-img-$ANDROID_ABI-google_apis-$ANDROID_API_LEVEL
   licenses:
