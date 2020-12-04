@@ -44,19 +44,30 @@ cache:
     - node_modules
 
 # Emulator Management: Create, Start and Wait
-# before_script:
-
-script:
+before_script:
   - echo "Start Testing commands..."
   - which avdmanager
   - echo $ANDROID_HOME"
   - emulator -list-avds
   - android list targets
   - echo "End Testing commands..."
-  - echo no | android create avd --force --name "Nexus5X" -t android-26 --abi armeabi-v7a -c 100M
-  - emulator -avd "Nexus_5X_API_26" -no-audio -no-window &
+
+  - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a -c 100M
+  - emulator -avd test -no-audio -no-window &
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
+ 
+  - echo no | android create avd --force -n Nexus5X -t android-22 --abi armeabi-v7a -c 100M
+  - emulator -avd Nexus5X -no-audio -no-window &
+  - android-wait-for-emulator
+  - adb shell input keyevent 82 &
+  
+  # - echo no | android create avd --force --name "Nexus5X" -t android-26 --abi armeabi-v7a -c 100M
+  # - emulator -avd "Nexus_5X_API_26" -no-audio -no-window &
+  # - android-wait-for-emulator
+  # - adb shell input keyevent 82 &
+
+script:
   # ....
   - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
   - export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
