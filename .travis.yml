@@ -58,7 +58,7 @@ cache:
 # Emulator Management: Create, Start and Wait
 before_script:
   - echo "Start Testing commands..."
-  - which avdmanager
+  # - which avdmanager
   - echo $ANDROID_HOME"
   - emulator -list-avds
   - android list targets
