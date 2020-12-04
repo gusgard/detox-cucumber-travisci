@@ -9,10 +9,10 @@ android:
 
     # The BuildTools version used by your project
     - build-tools-26.0.2
-    # - build-tools-27.0.3
+    - build-tools-27.0.3
 
     # The SDK version used to compile your project
-    # - android-24
+    - android-24
     # - android-26
     # - android-27
 
@@ -23,11 +23,11 @@ android:
 
     # Specify at least one system image,
     # if you need to run emulator(s) during your tests
-    # - sys-img-x86-android-24
+    - sys-img-x86-android-24
     # - sys-img-x86-android-26
     # - sys-img-x86-android-27
-    # - sys-img-armeabi-v7a-android-17
-    # - sys-img-armeabi-v7a-android-24
+    - sys-img-armeabi-v7a-android-17
+    - sys-img-armeabi-v7a-android-24
     # - sys-img-armeabi-v7a-android-26
     # - sys-img-armeabi-v7a-android-27
 
@@ -35,7 +35,6 @@ android:
     - sys-img-x86-$ANDROID_TARGET
     - sys-img-armeabi-v7a-$ANDROID_TARGET
   licenses:
-    # - android-sdk-preview-license-52d11cd2
     - android-sdk-preview-license-.+
     - android-sdk-license-.+
     - google-gdk-license-.+
@@ -50,7 +49,6 @@ env:
     - ANDROID_TARGET=android-27 ANDROID_ABI=armeabi-v7a
   global:
     - NODE_VERSION=12
-  # - NODE_VERSION=stable
 
 cache:
   yarn: true
