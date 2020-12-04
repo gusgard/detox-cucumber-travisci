@@ -21,24 +21,17 @@ android:
     # Specify at least one system image,
     # if you need to run emulator(s) during your tests
     - sys-img-x86-android-24
-    # - sys-img-x86-android-26
-    # - sys-img-armeabi-v7a-android-17
+    - sys-img-x86-android-26
+    - sys-img-x86-android-27
+    - sys-img-armeabi-v7a-android-17
     - sys-img-armeabi-v7a-android-24
+    - sys-img-armeabi-v7a-android-26
   licenses:
     # - android-sdk-preview-license-52d11cd2
     - android-sdk-preview-license-.+
     - android-sdk-license-.+
     - google-gdk-license-.+
 
-# os: linux
-# language: android
-# jdk: oraclejdk8
-# sudo: required
-# android:
-#   components:
-#     - build-tools-27.0.3
-#     - android-27
-#     - sys-img-x86-android-27
 
 env:
   global:
@@ -51,38 +44,45 @@ cache:
     - node_modules
 
 # Emulator Management: Create, Start and Wait
-before_script:
+# before_script:
+
+script:
+  - echo "Start Testing commands..."
+  - which avdmanager
+  - echo $ANDROID_HOME"
+  - emulator -list-avds
+  - android list targets
+  - echo "End Testing commands..."
   - echo no | android create avd --force --name "Nexus5X" -t android-26 --abi armeabi-v7a -c 100M
   - emulator -avd "Nexus_5X_API_26" -no-audio -no-window &
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
+  # ....
+  - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
+  - export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+  - nvm install $NODE_VERSION
+  - nvm use $NODE_VERSION
+  - nvm alias default $NODE_VERSION
 
-script:
-- curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
-- export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-- nvm install $NODE_VERSION
-- nvm use $NODE_VERSION
-- nvm alias default $NODE_VERSION
+  - npm install -g yarn
+  - npm install -g react-native-cli
+  - npm install -g detox-cli
 
-- npm install -g yarn
-- npm install -g react-native-cli
-- npm install -g detox-cli
+  # - export ANDROID_HOME=/usr/local/android-sdk
+  # - export PATH=$PATH:$ANDROID_HOME/emulator
+  # - export PATH=$PATH:$ANDROID_HOME/tools
+  # - export PATH=$PATH:$ANDROID_HOME/tools/bin
+  # - export PATH=$PATH:$ANDROID_HOME/platform-tools
+  - which avdmanager
+  # - yes | sdkmanager --licenses
+  # - sdkmanager --install "system-images;android-27;google_apis;x86
+  - echo $ANDROID_HOME"
+  # - echo yes | sdkmanager --channel=0 --verbose "system-images;android-27;default;x86_64"
+  - echo "Waiting emulator is ready..."
+  - emulator -list-avds
+  - android list targets
 
-# - export ANDROID_HOME=/usr/local/android-sdk
-# - export PATH=$PATH:$ANDROID_HOME/emulator
-# - export PATH=$PATH:$ANDROID_HOME/tools
-# - export PATH=$PATH:$ANDROID_HOME/tools/bin
-# - export PATH=$PATH:$ANDROID_HOME/platform-tools
-- which avdmanager
-# - yes | sdkmanager --licenses
-# - sdkmanager --install "system-images;android-27;google_apis;x86
-- echo $ANDROID_HOME"
-# - echo yes | sdkmanager --channel=0 --verbose "system-images;android-27;default;x86_64"
-- echo "Waiting emulator is ready..."
-- emulator -list-avds
-- android list targets
-
-- yarn install --silent
-- yarn detox build --configuration android.emu.release
-# - yarn detox clean-framework-cache && yarn detox build-framework-cache
-- configuration="android.emu.release" yarn detox:cucumber
+  - yarn install --silent
+  - yarn detox build --configuration android.emu.release
+  # - yarn detox clean-framework-cache && yarn detox build-framework-cache
+  - configuration="android.emu.release" yarn detox:cucumber
