@@ -1,0 +1,117 @@
+language: android
+dist: trusty
+android:
+  components:
+    # Uncomment the lines below if you want to
+    # use the latest revision of Android SDK Tools
+    - tools
+    - platform-tools
+
+    # The BuildTools version used by your project
+    - build-tools-26.0.2
+    - build-tools-27.0.3
+
+    # The SDK version used to compile your project
+    - android-22
+    # - android-24
+    # - android-26
+    # - android-27
+
+    # Additional components
+    - extra-google-google_play_services
+    - extra-google-m2repository
+    - extra-android-m2repository
+
+    - extra-android-support
+
+    # Specify at least one system image,
+    # if you need to run emulator(s) during your tests
+    # - sys-img-x86-android-24
+    # - sys-img-x86-android-26
+    # - sys-img-x86-android-27
+    # - sys-img-armeabi-v7a-android-17
+    # - sys-img-armeabi-v7a-android-24
+    # - sys-img-armeabi-v7a-android-26
+    # - sys-img-armeabi-v7a-android-27
+
+    - $ANDROID_TARGET
+    - sys-img-x86-$ANDROID_TARGET
+    # - sys-img-armeabi-v7a-$ANDROID_TARGET
+    - sys-img-$ANDROID_ABI-addon-google_apis-google-$ANDROID_API_LEVEL
+    - sys-img-$ANDROID_ABI-google_apis-$ANDROID_API_LEVEL
+  licenses:
+    - android-sdk-preview-license-.+
+    - android-sdk-license-.+
+    - google-gdk-license-.+
+
+
+env:
+  matrix:
+    # - ANDROID_TARGET=android-4 ANDROID_ABI=armeabi
+    # - ANDROID_TARGET=android-10 ANDROID_ABI=armeabi
+    # - ANDROID_TARGET=android-24 ANDROID_ABI=armeabi-v7a
+    - ANDROID_API_LEVEL=26 ANDROID_TARGET=android-26 ANDROID_ABI=armeabi-v7a
+    - ANDROID_API_LEVEL=27 ANDROID_TARGET=android-27 ANDROID_ABI=armeabi-v7a
+  global:
+    - NODE_VERSION=12
+
+cache:
+  yarn: true
+  directories:
+    - node_modules
+
+# Emulator Management: Create, Start and Wait
+before_script:
+  - echo "Start Testing commands..."
+  # - which avdmanager
+  # - echo $ANDROID_HOME"
+  # - emulator -list-avds
+  - android list targets
+  # - echo "End Testing commands..."
+
+  - echo no | android create avd --force -n Nexus5X -t $ANDROID_TARGET --abi google_apis/$ANDROID_ABI -c 100M
+  # - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a -c 100M
+  - emulator -avd Nexus5X -no-audio -no-window &
+  - android-wait-for-emulator
+  - adb shell input keyevent 82 &
+ 
+  # - echo no | android create avd --force -n Nexus5X -t android-22 --abi armeabi-v7a -c 100M
+  # - emulator -avd Nexus5X -no-audio -no-window &
+  # - android-wait-for-emulator
+  # - adb shell input keyevent 82 &
+  
+  # - echo no | android create avd --force --name "Nexus5X" -t android-26 --abi armeabi-v7a -c 100M
+  # - emulator -avd "Nexus_5X_API_26" -no-audio -no-window &
+  # - android-wait-for-emulator
+  # - adb shell input keyevent 82 &
+
+script:
+  # ....
+  - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
+  - export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+  - nvm install $NODE_VERSION
+  - nvm use $NODE_VERSION
+  - nvm alias default $NODE_VERSION
+
+  - npm install -g yarn
+  - npm install -g react-native-cli
+  - npm install -g detox-cli react-native-cli
+
+  # - export ANDROID_HOME=/usr/local/android-sdk
+  # - export PATH=$PATH:$ANDROID_HOME/emulator
+  # - export PATH=$PATH:$ANDROID_HOME/tools
+  # - export PATH=$PATH:$ANDROID_HOME/tools/bin
+  # - export PATH=$PATH:$ANDROID_HOME/platform-tools
+  # - which avdmanager
+  # - yes | sdkmanager --licenses
+  # - sdkmanager --install "system-images;android-27;google_apis;x86
+  # - echo $ANDROID_HOME"
+  # - echo yes | sdkmanager --channel=0 --verbose "system-images;android-27;default;x86_64"
+  - echo "Waiting emulator is ready..."
+  - emulator -list-avds
+  - android list targets
+
+  - yarn install --silent
+  - yarn detox build --configuration android.emu.release
+  # - yarn detox clean-framework-cache && yarn detox build-framework-cache
+  - configuration="android.emu.release" yarn detox:cucumber
