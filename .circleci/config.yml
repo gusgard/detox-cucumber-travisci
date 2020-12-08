@@ -1,13 +1,44 @@
-version: 2.1
+# version: 2.1
+version: 2
 
-orbs:
-  android: circleci/android@0.2.1
+defaults: &defaults
+  machine: true
+  # working_directory: ~/project
 
+aliases:
+  - &build-docker
+    name: Build Docker Image
+    command: |
+      docker build -t reactnativecommunity/react-native-android .
+      docker run --rm --name rn-env reactnativecommunity/react-native-android bin/sh -c "npx envinfo"
 jobs:
-  build:
-    executor: android/android
-
+  test:
+    <<: *defaults
     steps:
       - checkout
+      - run: *build-docker
       - run:
-          command: ./gradlew build
+          name: Test Avd
+          command: |
+            docker run --rm --name rn-build -v $PWD:/pwd -w /pwd reactnativecommunity/react-native-android bash -c "yarn install"
+            docker run --rm --name rn-build -v $PWD:/pwd -w /pwd reactnativecommunity/react-native-android bash -c "npm install -g detox-cli react-native-cli"
+            docker run --rm --name rn-build -v $PWD:/pwd -w /pwd reactnativecommunity/react-native-android bash -c "chmod +x ./test-avd.sh && ./test-avd.sh"
+            docker run --rm --name rn-build -v $PWD:/pwd -w /pwd reactnativecommunity/react-native-android bash -c "yarn detox build --configuration android.emu.release"
+            docker run --rm --name rn-build -v $PWD:/pwd -w /pwd reactnativecommunity/react-native-android bash -c "emulator -list-avds"
+            docker run --rm --name rn-build -v $PWD:/pwd -w /pwd reactnativecommunity/react-native-android bash -c "configuration="android.emu.release" yarn detox:cucumber"
+  # deploy:
+  #   <<: *defaults
+  #   steps:
+  #     - checkout
+  #     - run: *build-docker
+  #     - run:
+  #         name: Deploy docker
+  #         command: |
+  #           source ~/.bashrc
+  #           nvm i node
+  #           node publish_docker.js
+workflows:
+  version: 2
+  main:
+    jobs:
+      - test
