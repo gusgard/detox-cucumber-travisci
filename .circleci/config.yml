@@ -9,6 +9,11 @@ jobs:
       - run: npm i -g envinfo && envinfo
       - run: yarn install
       - run: cd android && chmod +x gradlew && ./gradlew assembleRelease
+      - run: npm install -g detox-cli react-native-cli
+      - run: chmod +x ./test-avd.sh && ./test-avd.sh
+      - run: yarn detox build --configuration android.emu.release
+      - run: emulator -list-avds
+      - run: configuration="android.emu.release" yarn detox:cucumber
 
 workflows:
   version: 2
@@ -16,13 +21,3 @@ workflows:
     jobs:
       - android
     
-
-
-#             docker run --rm --name rn-build -v $PWD:/pwd -w /pwd react-native-community/react-native bash -c "chmod +x ./test-avd.sh && ./test-avd.sh"
-# #            docker run --rm --name rn-env reactnativecommunity/react-native-android bash -c "npm i -g envinfo && envinfo"
-#             docker run --rm --name rn-build -v $PWD:/pwd -w /pwd reactnativecommunity/react-native-android bash -c "yarn install"
-#             docker run --rm --name rn-build -v $PWD:/pwd -w /pwd reactnativecommunity/react-native-android bash -c "npm install -g detox-cli react-native-cli"
-#             docker run --rm --name rn-build -v $PWD:/pwd -w /pwd reactnativecommunity/react-native-android bash -c "chmod +x ./test-avd.sh && ./test-avd.sh"
-#             docker run --rm --name rn-build -v $PWD:/pwd -w /pwd reactnativecommunity/react-native-android bash -c "yarn detox build --configuration android.emu.release"
-#             docker run --rm --name rn-build -v $PWD:/pwd -w /pwd reactnativecommunity/react-native-android bash -c "emulator -list-avds"
-#             docker run --rm --name rn-build -v $PWD:/pwd -w /pwd reactnativecommunity/react-native-android bash -c "configuration="android.emu.release" yarn detox:cucumber"
