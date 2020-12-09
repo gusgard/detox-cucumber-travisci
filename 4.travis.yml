@@ -1,0 +1,21 @@
+language: java
+
+services:
+  - docker
+
+before_install:
+- docker pull reactnativecommunity/react-native-android
+
+script:
+- docker run --rm --name rn-env reactnativecommunity/react-native-android bash -c "npm i -g envinfo && envinfo"
+- docker run --rm --name rn-build -v $PWD:/pwd -w /pwd reactnativecommunity/react-native-android bash -c "yarn install"
+# - docker run --rm --name rn-build -v $PWD:/pwd -w /pwd reactnativecommunity/react-native-android bash -c "yarn install && cd android && chmod +x gradlew && ./w assembleRelease"
+- docker run --rm --name rn-build -v $PWD:/pwd -w /pwd reactnativecommunity/react-native-android bash -c "npm install -g detox-cli react-native-cli"
+
+# - docker run --rm --name rn-build -v $PWD:/pwd -w /pwd reactnativecommunity/react-native-android bash -c "echo no | avdmanager create avd -n testEmulator -k "system-images;android-21;google_apis;armeabi-v7a""
+- docker run --rm --name rn-build -v $PWD:/pwd -w /pwd reactnativecommunity/react-native-android bash -c "chmod +x ./test-avd.sh && ./test-avd.sh"
+
+- docker run --rm --name rn-build -v $PWD:/pwd -w /pwd reactnativecommunity/react-native-android bash -c "yarn detox build --configuration android.emu.release"
+# - docker run --rm --name rn-build -v $PWD:/pwd -w /pwd reactnativecommunity/react-native-android bash -c "android list targets"
+- docker run --rm --name rn-build -v $PWD:/pwd -w /pwd reactnativecommunity/react-native-android bash -c "emulator -list-avds"
+- docker run --rm --name rn-build -v $PWD:/pwd -w /pwd reactnativecommunity/react-native-android bash -c "configuration="android.emu.release" yarn detox:cucumber"
