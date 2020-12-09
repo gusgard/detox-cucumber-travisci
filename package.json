@@ -14,7 +14,9 @@
     "detox:ios:test:verbose": "loglevel='verbose' yarn detox:ios:test",
     "detox:android:build": "yarn detox build --configuration android.emu.debug",
     "detox:android:test": "configuration='android.emu.debug' yarn detox:cucumber",
-    "detox:android:test:verbose": "loglevel='verbose' yarn detox:android:test"
+    "detox:android:test:verbose": "loglevel='verbose' yarn detox:android:test",
+    "detox:android:build:release": "yarn detox build --configuration android.emu.release",
+    "detox:android:test:release": "configuration='android.emu.release' yarn detox:cucumber"
   },
   "dependencies": {
     "moment-timezone": "^0.5.31",
