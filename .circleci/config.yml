@@ -14,9 +14,9 @@ jobs:
       - run: yarn detox build --configuration android.emu.release
       - run: emulator -list-avds
       # - run: sudo apt update && sudo apt install -y libxkbcommon-x11-0
-      - run:  sudo apt install x11-utils
+      # - run:  sudo apt install x11-utils
       - run: export QT_DEBUG_PLUGINS=1
-      - run: configuration="android.emu.release" yarn detox:cucumber
+      - run: export QT_DEBUG_PLUGINS=1 configuration="android.emu.release" yarn detox:cucumber
 
   ios:
     working_directory: ~/repo
