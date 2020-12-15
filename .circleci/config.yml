@@ -18,8 +18,10 @@ jobs:
 
   ios:
     working_directory: ~/repo
-    docker:
-      - image: react-native-community/react-native@1.0.0
+    # docker:
+    #   - image: react-native-community/react-native@1.0.0
+    macos:
+      xcode: 11.3.0
     steps:
       - checkout
       - run: brew tap wix/brew
