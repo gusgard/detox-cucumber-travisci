@@ -16,7 +16,7 @@ jobs:
       - run: yarn detox build --configuration android.emu.release
       - run: emulator -list-avds
       - run: export QT_DEBUG_PLUGINS=1
-      - run: export QT_DEBUG_PLUGINS=1 configuration="android.emu.release" yarn detox:cucumber
+      - run: QT_DEBUG_PLUGINS=1 configuration="android.emu.release" yarn detox:cucumber
 
   ios:
     working_directory: ~/repo
